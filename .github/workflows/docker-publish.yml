@@ -15,7 +15,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.3'  # Match this with the version you are using locally
+          flutter-version: '3.27.3'
 
       - name: Check Flutter version
         run: flutter --version
@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t your-image-name .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/flutter_kubernets:latest .
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -38,4 +38,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push your-image-name
+          docker push ${{ secrets.DOCKER_USERNAME }}/your-image-name:latest
