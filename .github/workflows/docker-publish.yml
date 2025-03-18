@@ -1,53 +1,41 @@
-name: Docker Deploy to DockerHub
+name: Docker Publish
 
 on:
   push:
     branches:
-      - master  # Change this if you're using a different branch
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # Install Flutter (if not already installed)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.0'  # Use the version you need
+          flutter-version: '3.27.3'  # Match this with the version you are using locally
 
-      # Run Flutter build for web
-      - name: Build Flutter Web
+      - name: Check Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Flutter web
+        run: flutter build web
+
+      - name: Build Docker image
         run: |
-          flutter pub get
-          flutter build web
+          docker build -t your-image-name .
 
-      # Set up Docker Buildx for multi-platform support
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Cache Docker layers to speed up builds
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      # Log in to Docker Hub using secrets
-      - name: Log in to Docker Hub
+      - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push Docker image
-      - name: Build and Push Docker image
+      - name: Push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}
+          docker push your-image-name
