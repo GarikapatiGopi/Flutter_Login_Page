@@ -3,7 +3,7 @@ name: Docker Deploy to DockerHub
 on:
   push:
     branches:
-      - master  # Change 'main' to 'master'
+      - master  # Ensure this matches your branch name
 
 jobs:
   build:
@@ -27,6 +27,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      # Debug: Display Docker version and available images
+      - name: Debug Docker setup
+        run: |
+          docker --version
+          docker images
+
       # Log in to Docker Hub using secrets
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -37,5 +43,8 @@ jobs:
       # Build and push Docker image
       - name: Build and Push Docker image
         run: |
-          # Build the Docker image and tag it with the commit SHA
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sh
+          echo "Building the Docker image..."
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }} .
+          
+          echo "Pushing the Docker image..."
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}
