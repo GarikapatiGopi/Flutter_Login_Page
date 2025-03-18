@@ -28,8 +28,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          # Build the Docker image and tag it with 'latest'
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flutter_kubernets:latest .
+
+      - name: List Docker images (Debugging step)
+        run: docker images
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -39,5 +41,4 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: |
-          # Push the image to Docker Hub
           docker push ${{ secrets.DOCKER_USERNAME }}/flutter_kubernets:latest
